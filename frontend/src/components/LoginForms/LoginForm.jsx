@@ -1,9 +1,10 @@
-// src/Components/SignUpForm.jsx
+// src/Components/LoginForm.jsx
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import InputField from "./InputField";
+import axios from "axios";
 
-export default function SignUpForm() {
+export default function LoginForm() {
   const {
     register,
     handleSubmit,
@@ -13,29 +14,22 @@ export default function SignUpForm() {
 
   const navigate = useNavigate();
 
-  // Hardcoded credentials to allow dashboard access
-  const correctEmail = "teacher@gmail.com";
-  const correctUsername = "teacher";
-  const correctPassword = "password123";
-
   const onSubmitForm = async (data) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000)); // simulate delay
-
-    const enteredEmail = data.email.toLowerCase();
-    const enteredUsername = data.username.toLowerCase();
-    const enteredPassword = data.password;
-
-    // Check credentials
-    if (
-      enteredEmail === correctEmail &&
-      enteredUsername === correctUsername &&
-      enteredPassword === correctPassword
-    ) {
-      console.log("Login Successful:", data);
-      localStorage.setItem("isLoggedIn", true); // allow dashboard access
-      navigate("/dashboard");
-    } else {
-      alert("Invalid credentials!");
+    console.log(data)
+    try {
+      // POST login data to backend
+      const response = await axios.post("/api/login", data);
+      console.log(response)
+      console.log(response.data)
+      if (response.data.success) {
+        localStorage.setItem("isLoggedIn", true);
+        navigate("/dashboard");
+      } else {
+        alert(response.data.message);
+      }
+    } catch (err) {
+      console.error("Error connecting to backend:", err);
+      alert("Server error! Please try again later.");
     }
 
     reset();
@@ -57,7 +51,7 @@ export default function SignUpForm() {
         register={register}
         rules={{
           required: { value: true, message: "Username is required" },
-          minLength: { value: 3, message: "At least 3 characters" },
+          minLength: { value: 3, message: "Username must be at least 3 characters long" },
         }}
         errors={errors}
       />
@@ -83,7 +77,10 @@ export default function SignUpForm() {
         type="password"
         placeholder="Enter password"
         register={register}
-        rules={{ required: { value: true, message: "Password is required" } }}
+        rules={{ 
+          required: { value: true, message: "Password is required" },
+          minLength: { value: 8, message: "Password must be at least 8 characters long" },
+        }}
         errors={errors}
       />
 
