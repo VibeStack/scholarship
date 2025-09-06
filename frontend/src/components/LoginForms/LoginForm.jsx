@@ -19,7 +19,8 @@ export default function LoginForm() {
       // POST login data to backend
       const response = await axios.post(
         "https://scholarship-b.vercel.app/api/login",
-        data
+        data,
+        {withCredentials:true}
       );
 
       if (response.data.success) {
