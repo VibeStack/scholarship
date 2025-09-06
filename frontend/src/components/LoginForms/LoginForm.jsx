@@ -15,12 +15,13 @@ export default function LoginForm() {
   const navigate = useNavigate();
 
   const onSubmitForm = async (data) => {
-    console.log(data)
     try {
       // POST login data to backend
-      const response = await axios.post("/api/login", data);
-      console.log(response)
-      console.log(response.data)
+      const response = await axios.post(
+        "http://localhost:8000/api/login",
+        data
+      );
+
       if (response.data.success) {
         localStorage.setItem("isLoggedIn", true);
         navigate("/dashboard");
@@ -32,7 +33,7 @@ export default function LoginForm() {
       alert("Server error! Please try again later.");
     }
 
-    reset();
+    // reset();
   };
 
   return (
@@ -40,9 +41,24 @@ export default function LoginForm() {
       className="bg-white shadow-lg rounded-xl w-full max-w-md p-6 mx-auto mt-10"
       onSubmit={handleSubmit(onSubmitForm)}
     >
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+      <div className="flex flex-col items-center mb-6">
+        <img
+          src="/img/gne_logo.png" 
+          alt="College Logo"
+          className="h-16 w-16 mb-3"
+        />
+        <h2 className="text-xl font-bold text-center text-gray-800">
+          Guru Nanak Dev Engineering College
+        </h2>
+        <p className="text-sm text-gray-600 mt-1">
+          Scholarship Management System (Teacher Portal)
+        </p>
+      </div>
+
+      {/* Form Title */}
+      <h3 className="text-lg font-semibold mb-6 text-center text-blue-700">
         Teacher Login
-      </h2>
+      </h3>
 
       <InputField
         label="Username"
@@ -51,7 +67,10 @@ export default function LoginForm() {
         register={register}
         rules={{
           required: { value: true, message: "Username is required" },
-          minLength: { value: 3, message: "Username must be at least 3 characters long" },
+          minLength: {
+            value: 3,
+            message: "Username must be at least 3 characters long",
+          },
         }}
         errors={errors}
       />
@@ -77,9 +96,12 @@ export default function LoginForm() {
         type="password"
         placeholder="Enter password"
         register={register}
-        rules={{ 
+        rules={{
           required: { value: true, message: "Password is required" },
-          minLength: { value: 8, message: "Password must be at least 8 characters long" },
+          minLength: {
+            value: 8,
+            message: "Password must be at least 8 characters long",
+          },
         }}
         errors={errors}
       />

@@ -14,63 +14,71 @@ export default function YearWiseField({ register, errors }) {
 
   return (
     <div className="bg-white p-4 rounded-lg border mb-6">
-      <h2 className="text-xl font-bold mb-4 border-b pb-2">Year-wise Fee Details</h2>
+      <h2 className="text-xl font-bold mb-4 border-b pb-2">
+        Year-wise Fee Details
+      </h2>
 
       {years.map((year) => (
         <div key={year} className="border p-4 rounded-lg mb-4 bg-gray-50">
           <h3 className="font-semibold mb-2 text-blue-600">{year}</h3>
           <InputField
             label="Fee Paid"
-            id={`${year}.feePaid`}
+            id={`yearWise.${year}.feePaid`}
             register={register}
             rules={{ required: "Fee Paid is required" }}
-            errors={errors[year] || {}}
+            errors={errors?.[year] || {}}
             type="number"
           />
+
           <InputField
             label="Bank Amount"
-            id={`${year}.credited.amount`}
+            id={`yearWise.${year}.credited.amount`}
             register={register}
             rules={{ required: "Amount is required" }}
-            errors={errors[year]?.credited || {}}
+            errors={errors?.[year]?.credited || {}}
             type="number"
           />
+
           <InputField
             label="Bank Name"
-            id={`${year}.credited.bank`}
+            id={`yearWise.${year}.credited.bank`}
             register={register}
             rules={{ required: "Bank Name is required" }}
-            errors={errors[year]?.credited || {}}
+            errors={errors?.[year]?.credited || {}}
           />
+
           <InputField
             label="Account No"
-            id={`${year}.credited.accountNo`}
+            id={`yearWise.${year}.credited.accountNo`}
             register={register}
             rules={{ required: "Account No is required" }}
-            errors={errors[year]?.credited || {}}
+            errors={errors?.[year]?.credited || {}}
           />
+
           <InputField
             label="Date"
-            id={`${year}.credited.date`}
+            id={`yearWise.${year}.credited.date`}
             register={register}
             rules={{ required: "Date is required" }}
-            errors={errors[year]?.credited || {}}
+            errors={errors?.[year]?.credited || {}}
             type="date"
           />
+
           <InputField
             label="40% Granted"
-            id={`${year}.granted40`}
+            id={`yearWise.${year}.granted40`}
             register={register}
             rules={{ required: "40% Granted is required" }}
-            errors={errors[year] || {}}
+            errors={errors?.[year] || {}}
             type="number"
           />
+
           <InputField
             label="60% Granted"
-            id={`${year}.granted60`}
+            id={`yearWise.${year}.granted60`}
             register={register}
             rules={{ required: "60% Granted is required" }}
-            errors={errors[year] || {}}
+            errors={errors?.[year] || {}}
             type="number"
           />
         </div>
