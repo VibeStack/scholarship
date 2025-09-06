@@ -1,28 +1,315 @@
-// src/Components/tableView/DataTable.jsx
+// src/components/tableView/DataTable.jsx
+import React, { useMemo, useState, useCallback } from "react";
 import TableRow from "./TableRow";
+import { saveAs } from "file-saver";
+import * as XLSX from "xlsx";
 
-export default function DataTable({ students, selectedColumns }) {
-  // Function to capitalize first letter
-  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+/* Helpers */
+const getNestedValue = (obj, path) =>
+  path
+    .split(".")
+    .reduce(
+      (acc, key) => (acc && acc[key] !== undefined ? acc[key] : null),
+      obj
+    );
+
+const formatHeader = (header) =>
+  header
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (s) => s.toUpperCase())
+    .replace(/\./g, " ");
+
+export default function DataTable({
+  students = [],
+  selectedColumns = [],
+  isLoading = false,
+  error = null,
+}) {
+  // selection & filtering state
+  const [selectedRowIds, setSelectedRowIds] = useState(new Set());
+  const [activeFilter, setActiveFilter] = useState({ col: null, value: "" });
+
+  // pagination
+  const [pageSize, setPageSize] = useState(25);
+  const [page, setPage] = useState(1);
+
+  // When a column is put under filter, all other column filters are disabled
+  const toggleFilterFor = (col) => {
+    if (activeFilter.col === col) {
+      setActiveFilter({ col: null, value: "" });
+    } else {
+      setActiveFilter({ col, value: "" });
+    }
+  };
+
+  const onFilterChange = (value) => setActiveFilter((s) => ({ ...s, value }));
+
+  // Filtered list (single column)
+  const filtered = useMemo(() => {
+    if (!activeFilter.col || activeFilter.value.trim() === "") return students;
+    const q = activeFilter.value.trim().toLowerCase();
+    return students.filter((stu) => {
+      const val = getNestedValue(stu, activeFilter.col);
+      return String(val ?? "")
+        .toLowerCase()
+        .includes(q);
+    });
+  }, [students, activeFilter]);
+
+  // Pagination calculations
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total / pageSize));
+  const start = (page - 1) * pageSize;
+  const pageData = filtered.slice(start, start + pageSize);
+
+  // Select toggles
+  const toggleSelect = useCallback(
+    (id) => {
+      setSelectedRowIds((prev) => {
+        const copy = new Set(prev);
+        if (copy.has(id)) copy.delete(id);
+        else copy.add(id);
+        return copy;
+      });
+    },
+    [setSelectedRowIds]
+  );
+
+  const selectAllOnPage = () => {
+    setSelectedRowIds((prev) => {
+      const copy = new Set(prev);
+      pageData.forEach((s) => copy.add(s._id || s.applicantId));
+      return copy;
+    });
+  };
+
+  const clearSelection = () => setSelectedRowIds(new Set());
+
+  const toggleSelectAllVisible = () => {
+    const visibleIds = pageData.map((s) => s._id || s.applicantId);
+    const allSelected = visibleIds.every((id) => selectedRowIds.has(id));
+    setSelectedRowIds((prev) => {
+      const copy = new Set(prev);
+      if (allSelected) {
+        visibleIds.forEach((id) => copy.delete(id));
+      } else {
+        visibleIds.forEach((id) => copy.add(id));
+      }
+      return copy;
+    });
+  };
+
+  // Export functionality:
+  // mode: "all" | "visible" | "selected"
+  const exportToExcel = (mode = "visible") => {
+    let dataToExport = [];
+    if (mode === "all") dataToExport = students;
+    else if (mode === "selected") {
+      const sel = students.filter((s) =>
+        selectedRowIds.has(s._id || s.applicantId)
+      );
+      dataToExport = sel;
+    } else {
+      // visible = filtered & only selectedColumns
+      dataToExport = filtered;
+    }
+
+    // map to flat rows with selectedColumns
+    const rows = dataToExport.map((stu) => {
+      const row = {};
+      selectedColumns.forEach((col) => {
+        const val = getNestedValue(stu, col);
+        row[formatHeader(col)] = val ?? "";
+      });
+      return row;
+    });
+
+    // Create workbook
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Students");
+
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    saveAs(
+      new Blob([wbout], { type: "application/octet-stream" }),
+      `students_${mode}_${Date.now()}.xlsx`
+    );
+  };
+
+  // UI states for small helpers
+  if (isLoading)
+    return (
+      <div className="text-center p-8 text-gray-500">
+        Loading student data...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="text-center p-8 text-red-500">
+        Error fetching data: {error}
+      </div>
+    );
+  if (!students || students.length === 0)
+    return (
+      <div className="text-center p-8 text-gray-500">No students found.</div>
+    );
 
   return (
-    <div className="overflow-x-auto bg-white shadow-sm rounded-lg border">
-      <table className="min-w-full text-sm text-left border-collapse">
-        <thead className="bg-gray-100">
-          <tr>
-            {selectedColumns.map((col) => (
-              <th key={col} className="px-4 py-2 border-b font-semibold text-gray-700">
-                {capitalize(col)}
-              </th>
+    <div className="bg-white rounded-lg shadow-md border overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-b">
+        <div className="flex items-center gap-2">
+          <div className="text-sm text-gray-600">Rows per page:</div>
+          <select
+            value={pageSize}
+            onChange={(e) => {
+              setPageSize(Number(e.target.value));
+              setPage(1);
+            }}
+            className="border rounded px-2 py-1"
+          >
+            {[10, 25, 50, 100].map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
             ))}
-          </tr>
-        </thead>
-        <tbody>
-          {students.map((student) => (
-            <TableRow key={student._id} student={student} selectedColumns={selectedColumns} />
-          ))}
-        </tbody>
-      </table>
+          </select>
+          <button
+            onClick={clearSelection}
+            className="px-2 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
+          >
+            Clear Selection
+          </button>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => exportToExcel("all")}
+            className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+          >
+            Export All
+          </button>
+          <button
+            onClick={() => exportToExcel("visible")}
+            className="px-3 py-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700"
+          >
+            Export Visible
+          </button>
+          <button
+            onClick={() => exportToExcel("selected")}
+            className="px-3 py-1 bg-yellow-600 text-black rounded text-sm hover:bg-yellow-700"
+            disabled={selectedRowIds.size === 0}
+          >
+            Export Selected ({selectedRowIds.size})
+          </button>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm text-left border-collapse">
+          <thead className="bg-gray-100 sticky top-0">
+            <tr>
+              <th className="px-3 py-2 border-b">
+                <input
+                  type="checkbox"
+                  onChange={toggleSelectAllVisible}
+                  checked={
+                    pageData.length > 0 &&
+                    pageData.every((s) =>
+                      selectedRowIds.has(s._id || s.applicantId)
+                    )
+                  }
+                />
+              </th>
+              {selectedColumns.map((col) => (
+                <th
+                  key={col}
+                  className="px-4 py-3 border-b font-semibold text-gray-600 text-xs uppercase tracking-wider"
+                >
+                  <div className="flex items-center gap-2">
+                    <span>{formatHeader(col)}</span>
+                    <button
+                      onClick={() => toggleFilterFor(col)}
+                      title={
+                        activeFilter.col === col
+                          ? "Remove filter"
+                          : "Filter this column (single-column filter)"
+                      }
+                      className={`p-1 rounded ${
+                        activeFilter.col === col
+                          ? "bg-indigo-600 text-white"
+                          : "bg-gray-200"
+                      }`}
+                    >
+                      🔍
+                    </button>
+                  </div>
+                  {activeFilter.col === col && (
+                    <div className="mt-2">
+                      <input
+                        value={activeFilter.value}
+                        onChange={(e) => onFilterChange(e.target.value)}
+                        placeholder={`Filter ${formatHeader(col)}...`}
+                        className="w-full px-2 py-1 text-sm border rounded"
+                      />
+                    </div>
+                  )}
+                </th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody className="divide-y divide-gray-200">
+            {pageData.map((student) => (
+              <TableRow
+                key={student._id || student.applicantId}
+                student={student}
+                selectedColumns={selectedColumns}
+                isSelected={selectedRowIds.has(
+                  student._id || student.applicantId
+                )}
+                toggleSelect={toggleSelect}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Footer / Pagination */}
+      <div className="flex items-center justify-between p-3 border-t">
+        <div className="text-sm text-gray-600">
+          Showing {start + 1} - {Math.min(start + pageSize, total)} of {total}{" "}
+          students
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            className="px-2 py-1 border rounded disabled:opacity-40"
+            disabled={page <= 1}
+          >
+            Prev
+          </button>
+          <div className="text-sm">
+            Page{" "}
+            <input
+              type="number"
+              value={page}
+              onChange={(e) => {
+                const v = Number(e.target.value) || 1;
+                setPage(Math.min(Math.max(1, v), pages));
+              }}
+              className="w-14 px-2 py-1 border rounded text-center"
+            />{" "}
+            / {pages}
+          </div>
+          <button
+            onClick={() => setPage((p) => Math.min(pages, p + 1))}
+            className="px-2 py-1 border rounded disabled:opacity-40"
+            disabled={page >= pages}
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

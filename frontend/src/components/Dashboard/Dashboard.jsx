@@ -20,10 +20,11 @@ export default function Dashboard() {
   });
 
   const navigate = useNavigate();
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   const onSubmit = async (data) => {
     try {
-      const res = await fetch("http://localhost:8000/api/students", {
+      const res = await fetch(`${apiUrl}/api/students`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

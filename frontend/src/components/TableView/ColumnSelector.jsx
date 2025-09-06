@@ -1,6 +1,19 @@
-// src/Components/tableView/ColumnSelector.jsx
-export default function ColumnSelector({ allColumns, selectedColumns, setSelectedColumns }) {
-  const handleToggle = (col) => {
+// src/components/tableView/ColumnSelector.jsx
+import React, { useMemo, useState } from "react";
+
+export default function ColumnSelector({
+  allColumns,
+  selectedColumns,
+  setSelectedColumns,
+}) {
+  const [query, setQuery] = useState("");
+
+  const visibleColumns = useMemo(() => {
+    if (!query) return allColumns;
+    return allColumns.filter((c) => c.toLowerCase().includes(query.toLowerCase()));
+  }, [allColumns, query]);
+
+  const toggle = (col) => {
     if (selectedColumns.includes(col)) {
       setSelectedColumns(selectedColumns.filter((c) => c !== col));
     } else {
@@ -8,19 +21,56 @@ export default function ColumnSelector({ allColumns, selectedColumns, setSelecte
     }
   };
 
+  const selectAllVisible = () => {
+    const unique = Array.from(new Set([...selectedColumns, ...visibleColumns]));
+    setSelectedColumns(unique);
+  };
+
+  const clearVisible = () => {
+    setSelectedColumns(selectedColumns.filter((c) => !visibleColumns.includes(c)));
+  };
+
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
   return (
-    <div className="mb-4 p-4 bg-white rounded-lg shadow-sm border">
-      <h3 className="font-semibold mb-2">Select Columns to Display:</h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        {allColumns.map((col) => (
+    <div className="mb-6 p-4 bg-white rounded-lg shadow-sm border">
+      <div className="flex items-center justify-between mb-3 gap-2">
+        <h3 className="font-semibold text-gray-800">Columns</h3>
+        <div className="flex gap-2">
+          <button
+            onClick={selectAllVisible}
+            className="px-2 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Select visible
+          </button>
+          <button
+            onClick={clearVisible}
+            className="px-2 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+          >
+            Clear visible
+          </button>
+        </div>
+      </div>
+
+      <div className="mb-3">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search columns..."
+          className="w-full px-3 py-2 border rounded focus:outline-none focus:ring"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+        {visibleColumns.map((col) => (
           <label key={col} className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={selectedColumns.includes(col)}
-              onChange={() => handleToggle(col)}
+              onChange={() => toggle(col)}
               className="h-4 w-4"
             />
-            {col}
+            <span className="select-none">{capitalize(col.replace(/\./g, " "))}</span>
           </label>
         ))}
       </div>

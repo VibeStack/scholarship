@@ -13,12 +13,13 @@ export default function LoginForm() {
   } = useForm();
 
   const navigate = useNavigate();
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   const onSubmitForm = async (data) => {
     try {
       // POST login data to backend
       const response = await axios.post(
-        "http://localhost:8000/api/login",
+        `${apiUrl}/api/login`,
         data,
         {withCredentials:true}
       );
