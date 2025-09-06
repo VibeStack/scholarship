@@ -13,7 +13,7 @@ export default function TableView() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/students");
+        const res = await fetch("https://scholarship-b.vercel.app/api/students");
         const data = await res.json();
         setStudents(data);
       } catch (error) {
