@@ -25,53 +25,70 @@ export default function TableView() {
       setIsLoading(true);
       setError(null);
       try {
+
         const res = await fetch(`${apiUrl}/api/students`);
         if (!res.ok) throw new Error(`Server returned ${res.status}`);
         const data = await res.json();
+
         if (mounted) setStudents(data);
+
       } catch (err) {
         if (mounted) setError(err.message || "Could not fetch");
       } finally {
         if (mounted) setIsLoading(false);
       }
     };
+
     fetchData();
+
     return () => {
       mounted = false;
     };
+
   }, [apiUrl]);
 
   // ✅ Filter students based on batch input
   const filteredStudents = useMemo(() => {
+
     if (!batchFilter.trim()) return students;
 
     const input = batchFilter.trim();
 
     // Check if input is a range: xxxx-xxxx
     const rangeMatch = input.match(/^(\d{4})\s*-\s*(\d{4})$/);
+
     if (rangeMatch) {
+
       const startInput = parseInt(rangeMatch[1], 10);
       const endInput = parseInt(rangeMatch[2], 10);
-      return students.filter((stu) => {
-        if (!stu.batch) return false;
-        const batchMatch = stu.batch.match(/^(\d{4})\s*-\s*(\d{4})$/);
+
+      return students.filter((student) => {
+        if (!student.batch) return false;
+
+        const batchMatch = student.batch.match(/^(\d{4})\s*-\s*(\d{4})$/);
+
         if (!batchMatch) return false;
+
         const batchStart = parseInt(batchMatch[1], 10);
         const batchEnd = parseInt(batchMatch[2], 10);
+
         return batchStart === startInput && batchEnd === endInput;
       });
+
     }
 
     // Otherwise treat input as a single year
     const year = parseInt(input, 10);
     if (isNaN(year)) return students; // fallback if input is invalid
-    return students.filter((stu) => {
-      if (!stu.batch) return false;
-      const batchMatch = stu.batch.match(/^(\d{4})\s*-\s*(\d{4})$/);
+    return students.filter((student) => {
+
+      if (!student.batch) return false;
+      const batchMatch = student.batch.match(/^(\d{4})\s*-\s*(\d{4})$/);
       if (!batchMatch) return false;
       const batchStart = parseInt(batchMatch[1], 10);
       const batchEnd = parseInt(batchMatch[2], 10);
       return year >= batchStart && year <= batchEnd;
+
     });
   }, [students, batchFilter]);
 
@@ -146,7 +163,7 @@ export default function TableView() {
       {/* Batch Filter */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-white rounded-lg shadow-sm border">
         <label className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-gray-700 font-medium">
-          <span>Batch Filter:</span>
+          <span className="font-bold">Batch Filter:</span>
           <input
             type="text"
             placeholder="e.g. 2022 or 2020-2024"

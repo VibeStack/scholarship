@@ -202,175 +202,221 @@ export default function DataTable({
     );
 
   return (
-    <div className="bg-white rounded-lg shadow-md border overflow-hidden">
-      {/* Top Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-b">
-        <div className="flex items-center gap-2">
-          <div className="text-sm text-gray-600">Rows per page:</div>
-          <select
-            value={pageSize}
-            onChange={(e) => {
-              setPageSize(Number(e.target.value));
-              setPage(1);
-            }}
-            className="border rounded px-2 py-1 text-[14px]"
-          >
-            {[10, 25, 50, 100].map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={clearSelection}
-            className="px-2 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
-          >
-            Clear Selection
-          </button>
-        </div>
+    <>
+      {selectedColumns.length !== 0 ? (
+        <div className="bg-white rounded-lg shadow-md border overflow-hidden">
+          {/* Top Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-b">
+            <div className="flex items-center gap-2">
+              <div className="text-sm font-bold text-gray-600">Rows per page:</div>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="border rounded px-2 py-1 text-[14px]"
+              >
+                {[10, 25, 50, 100].map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={clearSelection}
+                className="px-2 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
+              >
+                Clear Selection
+              </button>
+            </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => exportToExcel("all")}
-            className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
-          >
-            Export All
-          </button>
-          <button
-            onClick={() => exportToExcel("visible")}
-            className="px-3 py-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700"
-          >
-            Export Visible
-          </button>
-          <button
-            onClick={() => exportToExcel("selected")}
-            className="px-3 py-1 bg-yellow-600 text-black rounded text-sm hover:bg-yellow-700"
-            disabled={selectedRowIds.size === 0}
-          >
-            Export Selected ({selectedRowIds.size})
-          </button>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-sm text-left border-collapse mb-2">
-          <thead className="bg-gray-100 sticky top-0">
-            <tr>
-              <th className="px-3 py-2 border-b">
-                <input
-                  type="checkbox"
-                  onChange={toggleSelectAllVisible}
-                  checked={
-                    pageData.length > 0 &&
-                    pageData.every((s) =>
-                      selectedRowIds.has(s._id || s.applicantId)
-                    )
-                  }
-                />
-              </th>
-              {selectedColumns.map((col) => (
-                <th
-                  key={col}
-                  className="px-4 py-3 border-b font-semibold text-gray-600 text-xs uppercase tracking-wider"
-                >
-                  <div className="flex items-center gap-2">
-                    <span>{formatHeader(col)}</span>
-                    <button
-                      onClick={() => toggleFilterFor(col)}
-                      title={
-                        activeFilter.col === col
-                          ? "Remove filter"
-                          : "Filter this column"
-                      }
-                      className={`p-1 rounded ${
-                        activeFilter.col === col
-                          ? "bg-indigo-600 text-white"
-                          : "bg-gray-200"
-                      }`}
-                    >
-                      🔍
-                    </button>
-                  </div>
-                  {activeFilter.col === col && (
-                    <div className="mt-2">
-                      <input
-                        value={activeFilter.value}
-                        onChange={(e) => onFilterChange(e.target.value)}
-                        placeholder={`Filter ${formatHeader(col)}...`}
-                        className="w-full px-2 py-1 text-sm border rounded"
-                      />
-                    </div>
-                  )}
-                </th>
-              ))}
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-gray-200">
-            {pageData.map((student) => (
-              <React.Fragment key={student._id || student.applicantId}>
-                <TableRow
-                  student={student}
-                  selectedColumns={selectedColumns}
-                  isSelected={selectedRowIds.has(
-                    student._id || student.applicantId
-                  )}
-                  toggleSelect={toggleSelect}
-                />
-                <tr>
-                  <td
-                    colSpan={selectedColumns.length + 1}
-                    className="p-3 bg-gray-50"
-                  >
-                    <YearWiseTable
-                      student={student}
-                      years={getYearsFromBatch(student.batch)}
-                    />
-                  </td>
-                </tr>
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Footer / Pagination */}
-      <div className="flex items-center justify-between p-3 border-t">
-        <div className="text-sm text-gray-600">
-          Showing {start + 1} - {Math.min(start + pageSize, total)} of {total}{" "}
-          students
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="px-2 py-1 border rounded disabled:opacity-40"
-            disabled={page <= 1}
-          >
-            Prev
-          </button>
-          <div className="text-sm">
-            Page{" "}
-            <input
-              type="number"
-              value={page}
-              onChange={(e) => {
-                const v = Number(e.target.value) || 1;
-                setPage(Math.min(Math.max(1, v), pages));
-              }}
-              className="w-14 px-2 py-1 border rounded text-center"
-            />{" "}
-            / {pages}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => exportToExcel("all")}
+                className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+              >
+                Export All
+              </button>
+              <button
+                onClick={() => exportToExcel("visible")}
+                className="px-3 py-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700"
+              >
+                Export Visible
+              </button>
+              <button
+                onClick={() => exportToExcel("selected")}
+                className="py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700 w-[175px]"
+                disabled={selectedRowIds.size === 0}
+              >
+                Export Selected ({selectedRowIds.size})
+              </button>
+            </div>
           </div>
-          <button
-            onClick={() => setPage((p) => Math.min(pages, p + 1))}
-            className="px-2 py-1 border rounded disabled:opacity-40"
-            disabled={page >= pages}
-          >
-            Next
-          </button>
+
+          {/* Table */}
+          <div className="overflow-x-auto overflow-y-auto max-h-[1240px]">
+            <table className="min-w-full text-sm text-left border-collapse mb-2 relative">
+              <thead className="bg-gray-100 sticky top-0 z-10">
+                <tr>
+                  {/* Checkbox column */}
+                  <th className="px-3 py-3 border-b bg-gray-100">
+                    <input
+                      type="checkbox"
+                      onChange={toggleSelectAllVisible}
+                      checked={
+                        pageData.length > 0 &&
+                        pageData.every((s) =>
+                          selectedRowIds.has(s._id || s.applicantId)
+                        )
+                      }
+                      className="h-4 w-4 rounded border-gray-300 focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </th>
+
+                  {/* Dynamic column headers */}
+                  {selectedColumns.map((col) => (
+                    <th
+                      key={col}
+                      className="px-4 py-3 border-b text-xs font-semibold uppercase tracking-wide text-gray-600"
+                    >
+                      <div className="flex flex-col text-center w-[150px] h-[100px] items-center justify-center">
+                        {/* Header label + filter button */}
+                        <div className="flex items-center justify-center gap-2 w-full">
+                          <span className="font-extrabold underline underline-offset-4">{formatHeader(col)}</span>
+                          <button
+                            onClick={() => toggleFilterFor(col)}
+                            title={
+                              activeFilter.col === col
+                                ? "Remove filter"
+                                : "Filter this column"
+                            }
+                            className={`p-1 rounded-md text-xs transition ${
+                              activeFilter.col === col
+                                ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                                : "bg-gray-200 hover:bg-gray-300 text-gray-600"
+                            }`}
+                          >
+                            🔍
+                          </button>
+                        </div>
+
+                        {/* Filter input box (shown when active) */}
+                        {activeFilter.col === col && (
+                          <div className="mt-2 w-full flex items-center justify-center">
+                            <input
+                              value={activeFilter.value}
+                              onChange={(e) => onFilterChange(e.target.value)}
+                              placeholder={`Filter ${formatHeader(col)}...`}
+                              className="w-full max-w-[160px] px-2 py-1 text-sm border rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-gray-200">
+                {pageData.map((student) => (
+                  <React.Fragment key={student._id || student.applicantId}>
+                    {/* Main student row */}
+                    <TableRow
+                      student={student}
+                      selectedColumns={selectedColumns}
+                      isSelected={selectedRowIds.has(
+                        student._id || student.applicantId
+                      )}
+                      toggleSelect={toggleSelect}
+                    />
+
+                    {/* Expanded YearWise table row */}
+                    <tr className="bg-gray-50">
+                      <td colSpan={selectedColumns.length + 1} className="p-4">
+                        <div className="border border-gray-200 rounded-md shadow-sm bg-white">
+                          <YearWiseTable
+                            student={student}
+                            years={getYearsFromBatch(student.batch)}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Footer / Pagination */}
+          <div className="flex items-center justify-between p-4 border-t bg-gray-50 font-bold">
+            {/* Left: Showing results */}
+            <div className="text-sm text-gray-600">
+              Showing{" "}
+              <span>
+                {start + 1} - {Math.min(start + pageSize, total)}
+              </span>{" "}
+              of <span>{total}</span> students
+            </div>
+
+            {/* Right: Pagination controls */}
+            <div className="flex items-center gap-4">
+              {/* Prev button */}
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="px-3 py-1.5 text-sm border rounded-md bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                disabled={page <= 1}
+              >
+                ← Prev
+              </button>
+
+              {/* Page input */}
+              <div className="flex items-center gap-2 text-sm">
+                Page
+                <input
+                  type="number"
+                  value={page}
+                  onChange={(e) => {
+                    const v = Number(e.target.value) || 1;
+                    setPage(Math.min(Math.max(1, v), pages));
+                  }}
+                  className="w-16 px-2 py-1 border rounded-md text-center focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                />
+                of <span className="font-medium">{pages}</span>
+              </div>
+
+              {/* Next button */}
+              <button
+                onClick={() => setPage((p) => Math.min(pages, p + 1))}
+                className="px-3 py-1.5 text-sm border rounded-md bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                disabled={page >= pages}
+              >
+                Next →
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center p-12 text-gray-500">
+          <svg
+            className="w-12 h-12 mb-3 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 13h6m2 0a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v4a2 2 0 002 2m12 0v6a2 2 0 01-2 2H7a2 2 0 01-2-2v-6"
+            />
+          </svg>
+          <p className="text-lg font-medium">No fields selected</p>
+          <p className="text-sm text-gray-400">
+            Please choose one or more columns to view student data.
+          </p>
+        </div>
+      )}
+    </>
   );
 }

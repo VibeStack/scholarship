@@ -30,7 +30,7 @@ function Row({ student, selectedColumns, isSelected, toggleSelect }) {
         return (
           <td
             key={col}
-            className="px-4 py-3 border-b text-gray-700 text-sm max-w-xs truncate"
+            className="px-4 py-3 border-b text-gray-700 text-sm max-w-xs text-center"
             title={String(display)}
           >
             {String(display)}

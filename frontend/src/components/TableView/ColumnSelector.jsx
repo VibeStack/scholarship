@@ -4,6 +4,7 @@ export default function ColumnSelector({ allColumns, selectedColumns, setSelecte
   const [query, setQuery] = useState("");
 
   const visibleColumns = useMemo(() => {
+
     if (!query) return allColumns;
     return allColumns.filter((c) => c.toLowerCase().includes(query.toLowerCase()));
   }, [allColumns, query]);
@@ -30,7 +31,7 @@ export default function ColumnSelector({ allColumns, selectedColumns, setSelecte
   return (
     <div className="mb-6 p-4 bg-white rounded-lg shadow border">
       <div className="flex items-center justify-between mb-3 gap-2">
-        <h3 className="font-semibold text-gray-800">Columns</h3>
+        <h3 className="font-bold text-gray-800">Columns</h3>
         <div className="flex gap-2">
           <button
             onClick={selectAllVisible}
@@ -46,13 +47,6 @@ export default function ColumnSelector({ allColumns, selectedColumns, setSelecte
           </button>
         </div>
       </div>
-
-      <input
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search columns..."
-        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-3"
-      />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
         {visibleColumns.map((col) => (
