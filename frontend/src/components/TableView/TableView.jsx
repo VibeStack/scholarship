@@ -1,5 +1,4 @@
-// src/components/tableView/TableView.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import ColumnSelector from "./ColumnSelector";
 import DataTable from "./DataTable";
@@ -16,6 +15,7 @@ export default function TableView() {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [batchFilter, setBatchFilter] = useState(""); // user input for batch filtering
 
   const apiUrl = import.meta.env.VITE_API_URL || "";
 
@@ -40,6 +40,40 @@ export default function TableView() {
       mounted = false;
     };
   }, [apiUrl]);
+
+  // ✅ Filter students based on batch input
+  const filteredStudents = useMemo(() => {
+    if (!batchFilter.trim()) return students;
+
+    const input = batchFilter.trim();
+
+    // Check if input is a range: xxxx-xxxx
+    const rangeMatch = input.match(/^(\d{4})\s*-\s*(\d{4})$/);
+    if (rangeMatch) {
+      const startInput = parseInt(rangeMatch[1], 10);
+      const endInput = parseInt(rangeMatch[2], 10);
+      return students.filter((stu) => {
+        if (!stu.batch) return false;
+        const batchMatch = stu.batch.match(/^(\d{4})\s*-\s*(\d{4})$/);
+        if (!batchMatch) return false;
+        const batchStart = parseInt(batchMatch[1], 10);
+        const batchEnd = parseInt(batchMatch[2], 10);
+        return batchStart === startInput && batchEnd === endInput;
+      });
+    }
+
+    // Otherwise treat input as a single year
+    const year = parseInt(input, 10);
+    if (isNaN(year)) return students; // fallback if input is invalid
+    return students.filter((stu) => {
+      if (!stu.batch) return false;
+      const batchMatch = stu.batch.match(/^(\d{4})\s*-\s*(\d{4})$/);
+      if (!batchMatch) return false;
+      const batchStart = parseInt(batchMatch[1], 10);
+      const batchEnd = parseInt(batchMatch[2], 10);
+      return year >= batchStart && year <= batchEnd;
+    });
+  }, [students, batchFilter]);
 
   const allColumns = [
     "applicantId",
@@ -72,12 +106,12 @@ export default function TableView() {
   ];
 
   const handleLogout = () => {
-    // Clear token/session here
     navigate("/");
   };
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-gray-50 rounded-xl shadow-md mt-8">
+      {/* Header */}
       <div className="flex flex-col items-center mb-6 relative">
         <img src="/img/gne_logo.png" alt="College Logo" className="h-16 w-16 mb-3" />
         <h1 className="text-2xl font-bold text-center text-gray-800">
@@ -104,18 +138,43 @@ export default function TableView() {
         </div>
       </div>
 
+      {/* Title */}
       <h2 className="text-3xl font-extrabold mb-6 text-center bg-gradient-to-r from-red-700 via-red-800 to-black bg-clip-text text-transparent">
         Student Scholarship Table
       </h2>
 
+      {/* Batch Filter */}
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-white rounded-lg shadow-sm border">
+        <label className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-gray-700 font-medium">
+          <span>Batch Filter:</span>
+          <input
+            type="text"
+            placeholder="e.g. 2022 or 2020-2024"
+            value={batchFilter}
+            onChange={(e) => setBatchFilter(e.target.value)}
+            className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition w-full sm:w-60"
+          />
+        </label>
+        <p className="text-sm text-gray-500">
+          Type a single year to get all batches containing that year, or type a range (xxxx-xxxx) for exact batch.
+        </p>
+      </div>
+
+      {/* Column Selector */}
       <ColumnSelector
         allColumns={allColumns}
         selectedColumns={selectedColumns}
         setSelectedColumns={setSelectedColumns}
       />
 
+      {/* Data Table */}
       <div className="mb-4">
-        <DataTable students={students} selectedColumns={selectedColumns} isLoading={isLoading} error={error} />
+        <DataTable
+          students={filteredStudents}
+          selectedColumns={selectedColumns}
+          isLoading={isLoading}
+          error={error}
+        />
       </div>
     </div>
   );

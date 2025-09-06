@@ -1,11 +1,6 @@
-// src/components/tableView/ColumnSelector.jsx
 import React, { useMemo, useState } from "react";
 
-export default function ColumnSelector({
-  allColumns,
-  selectedColumns,
-  setSelectedColumns,
-}) {
+export default function ColumnSelector({ allColumns, selectedColumns, setSelectedColumns }) {
   const [query, setQuery] = useState("");
 
   const visibleColumns = useMemo(() => {
@@ -33,7 +28,7 @@ export default function ColumnSelector({
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
   return (
-    <div className="mb-6 p-4 bg-white rounded-lg shadow-sm border">
+    <div className="mb-6 p-4 bg-white rounded-lg shadow border">
       <div className="flex items-center justify-between mb-3 gap-2">
         <h3 className="font-semibold text-gray-800">Columns</h3>
         <div className="flex gap-2">
@@ -52,23 +47,21 @@ export default function ColumnSelector({
         </div>
       </div>
 
-      <div className="mb-3">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search columns..."
-          className="w-full px-3 py-2 border rounded focus:outline-none focus:ring"
-        />
-      </div>
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search columns..."
+        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-3"
+      />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
         {visibleColumns.map((col) => (
-          <label key={col} className="flex items-center gap-2 text-sm">
+          <label key={col} className="flex items-center gap-2 text-sm cursor-pointer">
             <input
               type="checkbox"
               checked={selectedColumns.includes(col)}
               onChange={() => toggle(col)}
-              className="h-4 w-4"
+              className="h-4 w-4 rounded border-gray-300 focus:ring-2 focus:ring-indigo-500"
             />
             <span className="select-none">{capitalize(col.replace(/\./g, " "))}</span>
           </label>

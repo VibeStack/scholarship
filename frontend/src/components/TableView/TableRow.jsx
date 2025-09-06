@@ -1,9 +1,7 @@
-// src/components/tableView/TableRow.jsx
 import React from "react";
 
-const getNestedValue = (obj, path) => {
-  return path.split(".").reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : null), obj);
-};
+const getNestedValue = (obj, path) =>
+  path.split(".").reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : null), obj);
 
 const formatDate = (dateString) => {
   if (!dateString) return "";
@@ -23,13 +21,18 @@ function Row({ student, selectedColumns, isSelected, toggleSelect }) {
           type="checkbox"
           checked={isSelected}
           onChange={() => toggleSelect(student._id || student.applicantId)}
+          className="h-4 w-4 rounded border-gray-300 focus:ring-2 focus:ring-indigo-500"
         />
       </td>
       {selectedColumns.map((col) => {
         const raw = getNestedValue(student, col);
         const display = col === "dob" ? formatDate(raw) : raw ?? "—";
         return (
-          <td key={col} className="px-4 py-3 border-b text-gray-700 text-sm max-w-xs truncate">
+          <td
+            key={col}
+            className="px-4 py-3 border-b text-gray-700 text-sm max-w-xs truncate"
+            title={String(display)}
+          >
             {String(display)}
           </td>
         );
