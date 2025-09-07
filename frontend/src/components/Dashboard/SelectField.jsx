@@ -1,4 +1,3 @@
-// src/Components/Dashboard/SelectField.jsx
 export default function SelectField({
   label,
   id,
@@ -8,7 +7,7 @@ export default function SelectField({
   errors,
 }) {
   return (
-    <div className="mb-4">
+    <div className="mb-4 relative">
       <label htmlFor={id} className="block text-gray-700 font-semibold mb-1">
         {label}
       </label>
@@ -24,6 +23,10 @@ export default function SelectField({
           </option>
         ))}
       </select>
+      {/* ✅ Error handling */}
+      {errors?.message && (
+        <p className="text-red-600 text-[12px] mt-1 pl-2 absolute">{errors.message}</p>
+      )}
     </div>
   );
 }
