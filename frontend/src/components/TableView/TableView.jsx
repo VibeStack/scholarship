@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import ColumnSelector from "./ColumnSelector";
 import DataTable from "./DataTable";
+import axios from "axios"
 
 export default function TableView() {
   const navigate = useNavigate();
