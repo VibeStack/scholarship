@@ -21,19 +21,27 @@ export default function TableView() {
 
   useEffect(() => {
     let mounted = true;
+
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
+
       try {
+        const res = await axios.get(`${apiUrl}/api/students`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-        const res = await fetch(`${apiUrl}/api/students`);
-        if (!res.ok) throw new Error(`Server returned ${res.status}`);
-        const data = await res.json();
-
-        if (mounted) setStudents(data);
-
+        if (mounted) setStudents(res.data);
       } catch (err) {
-        if (mounted) setError(err.message || "Could not fetch");
+        if (mounted) {
+          if (axios.isAxiosError(err)) {
+            setError(err.response?.data?.message || err.message);
+          } else {
+            setError("Could not fetch students");
+          }
+        }
       } finally {
         if (mounted) setIsLoading(false);
       }
@@ -44,12 +52,10 @@ export default function TableView() {
     return () => {
       mounted = false;
     };
-
   }, [apiUrl]);
 
   // ✅ Filter students based on batch input
   const filteredStudents = useMemo(() => {
-
     if (!batchFilter.trim()) return students;
 
     const input = batchFilter.trim();
@@ -58,7 +64,6 @@ export default function TableView() {
     const rangeMatch = input.match(/^(\d{4})\s*-\s*(\d{4})$/);
 
     if (rangeMatch) {
-
       const startInput = parseInt(rangeMatch[1], 10);
       const endInput = parseInt(rangeMatch[2], 10);
 
@@ -74,21 +79,18 @@ export default function TableView() {
 
         return batchStart === startInput && batchEnd === endInput;
       });
-
     }
 
     // Otherwise treat input as a single year
     const year = parseInt(input, 10);
     if (isNaN(year)) return students; // fallback if input is invalid
     return students.filter((student) => {
-
       if (!student.batch) return false;
       const batchMatch = student.batch.match(/^(\d{4})\s*-\s*(\d{4})$/);
       if (!batchMatch) return false;
       const batchStart = parseInt(batchMatch[1], 10);
       const batchEnd = parseInt(batchMatch[2], 10);
       return year >= batchStart && year <= batchEnd;
-
     });
   }, [students, batchFilter]);
 
@@ -130,11 +132,17 @@ export default function TableView() {
     <div className="max-w-7xl mx-auto p-6 bg-gray-50 rounded-xl shadow-md mt-8">
       {/* Header */}
       <div className="flex flex-col items-center mb-6 relative">
-        <img src="/img/gne_logo.png" alt="College Logo" className="h-16 w-16 mb-3" />
+        <img
+          src="/img/gne_logo.png"
+          alt="College Logo"
+          className="h-16 w-16 mb-3"
+        />
         <h1 className="text-2xl font-bold text-center text-gray-800">
           Guru Nanak Dev Engineering College
         </h1>
-        <p className="text-sm text-gray-600">Scholarship Management System (Teacher Portal)</p>
+        <p className="text-sm text-gray-600">
+          Scholarship Management System (Teacher Portal)
+        </p>
 
         <div className="absolute right-0 top-0 flex gap-2">
           <button
@@ -173,7 +181,8 @@ export default function TableView() {
           />
         </label>
         <p className="text-sm text-gray-500">
-          Type a single year to get all batches containing that year, or type a range (xxxx-xxxx) for exact batch.
+          Type a single year to get all batches containing that year, or type a
+          range (xxxx-xxxx) for exact batch.
         </p>
       </div>
 
