@@ -6,22 +6,34 @@ import studentRoutes from "./routes/student.route.js";
 
 const app = express();
 
+// Body parsing
+app.use(express.json({ limit: "16kb" }));
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+
+// Cookies
+app.use(cookieParser());
+
+// Static files
+app.use(express.static("public"));
+
+// ✅ CORS - should come before routes
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: process.env.CORS_ORIGIN, // e.g., "https://scholarship-fa.vercel.app"
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "x-client-key",
+      "x-client-token",
+      "x-client-secret",
+    ],
+    credentials: true, // Allow cookies
   })
 );
 
-app.use(express.json({ limit: "16kb" }));
-app.use(express.urlencoded({ extended: true, limit: "16kb" }));
-app.use(express.static("public"));
-app.use(cookieParser())
-
-
-
+// Routes
 app.use("/api", authRoutes);
 app.use("/api", studentRoutes);
 
