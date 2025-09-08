@@ -16,7 +16,7 @@ const formatDate = (dateString) => {
 function Row({ student, selectedColumns, isSelected, toggleSelect }) {
   return (
     <tr className="hover:bg-gray-50 transition-colors duration-150">
-      <td className="px-3 py-2 border-b whitespace-nowrap">
+      <td className="px-3 py-2">
         <input
           type="checkbox"
           checked={isSelected}
@@ -30,7 +30,7 @@ function Row({ student, selectedColumns, isSelected, toggleSelect }) {
         return (
           <td
             key={col}
-            className="px-4 py-3 border-b text-gray-700 text-sm max-w-xs text-center"
+            className="px-4 py-3 text-gray-700 text-sm text-center"
             title={String(display)}
           >
             {String(display)}

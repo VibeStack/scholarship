@@ -247,7 +247,7 @@ export default function DataTable({
               </button>
               <button
                 onClick={() => exportToExcel("selected")}
-                className="py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700 w-[175px]"
+                className="px-3 py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700 w-[160px]"
                 disabled={selectedRowIds.size === 0}
               >
                 Export Selected ({selectedRowIds.size})
@@ -257,7 +257,7 @@ export default function DataTable({
 
           {/* Table */}
           <div className="overflow-x-auto overflow-y-auto max-h-[1240px]">
-            <table className="min-w-full text-sm text-left border-collapse mb-2 relative">
+            <table className="w-full text-sm text-left border-collapse mb-2 relative">
               <thead className="bg-gray-100 sticky top-0 z-10">
                 <tr>
                   {/* Checkbox column */}
@@ -281,10 +281,10 @@ export default function DataTable({
                       key={col}
                       className="px-4 py-3 border-b text-xs font-semibold uppercase tracking-wide text-gray-600"
                     >
-                      <div className="flex flex-col text-center w-[150px] h-[100px] items-center justify-center">
+                      <div className="flex flex-col text-center w-[175px] h-[100px] items-center justify-center">
                         {/* Header label + filter button */}
-                        <div className="flex items-center justify-center gap-2 w-full">
-                          <span className="font-extrabold underline underline-offset-4">
+                        <div className="flex flex-col items-center justify-center gap-2 w-full">
+                          <span className="font-extrabold underline underline-offset-2 max-w-[125px]">
                             {formatHeader(col)}
                           </span>
                           <button
@@ -298,7 +298,7 @@ export default function DataTable({
                               activeFilter.col === col
                                 ? "bg-indigo-600 text-white hover:bg-indigo-700"
                                 : "bg-gray-200 hover:bg-gray-300 text-gray-600"
-                            }`}
+                            } right-0`}
                           >
                             🔍
                           </button>
@@ -311,7 +311,7 @@ export default function DataTable({
                               value={activeFilter.value}
                               onChange={(e) => onFilterChange(e.target.value)}
                               placeholder={`Filter ${formatHeader(col)}...`}
-                              className="w-full max-w-[160px] px-2 py-1 text-sm border rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                              className="w-full max-w-[150px] px-2 py-1 text-sm border rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                             />
                           </div>
                         )}
@@ -321,9 +321,8 @@ export default function DataTable({
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-gray-200">
-                {pageData.map((student) => (
-                  <React.Fragment key={student._id || student.applicantId}>
+              {pageData.map((student) => (
+                  <tbody key={student._id || student.applicantId} className="rounded-2xl ">
                     {/* Main student row */}
                     <TableRow
                       student={student}
@@ -336,8 +335,8 @@ export default function DataTable({
 
                     {/* Expanded YearWise table row */}
                     <tr className="bg-gray-50">
-                      <td colSpan={selectedColumns.length + 1} className="p-4">
-                        <div className="border border-gray-200 rounded-md shadow-sm bg-white">
+                      <td colSpan={selectedColumns.length + 1} className="px-4">
+                        <div>
                           <YearWiseTable
                             student={student}
                             years={getYearsFromBatch(student.batch)}
@@ -345,9 +344,8 @@ export default function DataTable({
                         </div>
                       </td>
                     </tr>
-                  </React.Fragment>
+                  </tbody>
                 ))}
-              </tbody>
             </table>
           </div>
 

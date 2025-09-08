@@ -57,7 +57,7 @@ export default function ColumnSelector({ allColumns, selectedColumns, setSelecte
               onChange={() => toggle(col)}
               className="h-4 w-4 rounded border-gray-300 focus:ring-2 focus:ring-indigo-500"
             />
-            <span className="select-none">{capitalize(col.replace(/\./g, " "))}</span>
+            <span className="select-none">{capitalize(col.replace(/\./g, ""))}</span>
           </label>
         ))}
       </div>
