@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import ColumnSelector from "./ColumnSelector";
 import DataTable from "./DataTable";
-import axios from "axios"
+import axios from "axios";
 
 export default function TableView() {
   const navigate = useNavigate();
@@ -56,6 +56,7 @@ export default function TableView() {
   }, [apiUrl]);
 
   // ✅ Filter students based on batch input
+  // ✅ Filter students based on batch input
   const filteredStudents = useMemo(() => {
     if (!batchFilter.trim()) return students;
 
@@ -70,28 +71,29 @@ export default function TableView() {
 
       return students.filter((student) => {
         if (!student.batch) return false;
-
         const batchMatch = student.batch.match(/^(\d{4})\s*-\s*(\d{4})$/);
-
         if (!batchMatch) return false;
 
         const batchStart = parseInt(batchMatch[1], 10);
-        const batchEnd = parseInt(batchMatch[2], 10);
 
-        return batchStart === startInput && batchEnd === endInput;
+        // ✅ include if batch start year lies within given range
+        return batchStart >= startInput && batchStart <= endInput;
       });
     }
 
-    // Otherwise treat input as a single year
+    // Otherwise treat input as a single start year
     const year = parseInt(input, 10);
     if (isNaN(year)) return students; // fallback if input is invalid
+
     return students.filter((student) => {
       if (!student.batch) return false;
       const batchMatch = student.batch.match(/^(\d{4})\s*-\s*(\d{4})$/);
       if (!batchMatch) return false;
+
       const batchStart = parseInt(batchMatch[1], 10);
-      const batchEnd = parseInt(batchMatch[2], 10);
-      return year >= batchStart && year <= batchEnd;
+
+      // ✅ include only if batch starts from given year
+      return batchStart === year;
     });
   }, [students, batchFilter]);
 

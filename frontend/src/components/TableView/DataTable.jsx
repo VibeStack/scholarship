@@ -69,15 +69,14 @@ export default function DataTable({
 
       if (!val) return false;
 
-      // Special handling for "batch" column
       if (activeFilter.col === "batch") {
         const match = String(val).match(/(\d{4})\s*-\s*(\d{4})/);
+        console.log(match)
         if (match) {
-          const startYear = parseInt(match[1], 10);
-          const endYear = parseInt(match[2], 10);
           const year = parseInt(q, 10);
+          console.log(year)
           if (!isNaN(year)) {
-            return year >= startYear && year <= endYear;
+            return year === parseInt(match[0]);
           }
         }
       }
@@ -208,7 +207,9 @@ export default function DataTable({
           {/* Top Controls */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-b">
             <div className="flex items-center gap-2">
-              <div className="text-sm font-bold text-gray-600">Rows per page:</div>
+              <div className="text-sm font-bold text-gray-600">
+                Rows per page:
+              </div>
               <select
                 value={pageSize}
                 onChange={(e) => {
@@ -283,7 +284,9 @@ export default function DataTable({
                       <div className="flex flex-col text-center w-[150px] h-[100px] items-center justify-center">
                         {/* Header label + filter button */}
                         <div className="flex items-center justify-center gap-2 w-full">
-                          <span className="font-extrabold underline underline-offset-4">{formatHeader(col)}</span>
+                          <span className="font-extrabold underline underline-offset-4">
+                            {formatHeader(col)}
+                          </span>
                           <button
                             onClick={() => toggleFilterFor(col)}
                             title={

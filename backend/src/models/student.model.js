@@ -10,8 +10,8 @@ const studentSchema = new mongoose.Schema(
     batch: { type: String, required: true },
 
     course: { type: String, required: true },
-    branch: { type: String, required: true },
-    leet: { type: String, enum: ["Leet", "Non-Leet"], required: true },
+    branch: { type: String},
+    leet: { type: String, enum: ["Leet", "Non-Leet"]},
 
     contactNo: { type: String, required: true },
     aadhaar: { type: String, required: true },

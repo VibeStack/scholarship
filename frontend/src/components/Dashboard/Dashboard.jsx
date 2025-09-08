@@ -17,9 +17,17 @@ export default function Dashboard() {
     register,
     handleSubmit,
     reset,
+    setValue, // ✅ add this
     formState: { errors, isSubmitting },
     control,
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      course: "",
+      branch: null,
+      leet: null,
+      remarks: null
+    },
+  });
 
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -124,6 +132,7 @@ export default function Dashboard() {
           register={register}
           errors={errors}
           control={control}
+          setValue={setValue}
         />
         <ContactAndBank register={register} errors={errors} />
 
