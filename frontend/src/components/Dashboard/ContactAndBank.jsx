@@ -43,10 +43,10 @@ export default function ContactAndBank({ register, errors }) {
           id="email"
           register={register}
           rules={{
-            required: { value: true, message: "Email is required" },
+            required: { value: true, message: "Email address is required" },
             pattern: {
               value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Enter a valid email address",
+              message: "Enter a valid email (e.g., user@domain.com)",
             },
           }}
           errors={errors?.email}

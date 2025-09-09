@@ -19,7 +19,7 @@ app.use(express.static("public"));
 // ✅ CORS - should come before routes
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN, // e.g., "https://scholarship-fa.vercel.app"
+    origin: process.env.CORS_ORIGIN,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",

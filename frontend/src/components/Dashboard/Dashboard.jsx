@@ -17,25 +17,20 @@ export default function Dashboard() {
     register,
     handleSubmit,
     reset,
-    setValue, // ✅ add this
+    setValue,
     formState: { errors, isSubmitting },
     control,
-  } = useForm({
-    defaultValues: {
-      course: "",
-      branch: null,
-      leet: null,
-      remarks: null
-    },
-  });
+  } = useForm();
 
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  const [degreeDuration, setDegreeDuration] = useState(0);
   const [yearWiseStart, setYearWiseStart] = useState("");
+  const [degreeDuration, setDegreeDuration] = useState(0);
 
   const onSubmit = async (data) => {
+
+    console.log(data)
     // Filter yearWise to only include years with data
     if (data.yearWise) {
       const filteredYearWise = {};
@@ -55,7 +50,6 @@ export default function Dashboard() {
       data.yearWise = filteredYearWise;
     }
 
-    console.log(data);
 
     try {
       const response = await axios.post(`${apiUrl}/api/students`, data, {
@@ -67,7 +61,7 @@ export default function Dashboard() {
         reset();
         navigate("/dashboard");
       } else {
-        alert("❌ Error: " + response.data.message);
+        alert("❌ Error : " + response.data.message);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -121,6 +115,7 @@ export default function Dashboard() {
 
       {/* Main Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+
         <ApplicantInfo
           register={register}
           errors={errors}
@@ -134,6 +129,7 @@ export default function Dashboard() {
           control={control}
           setValue={setValue}
         />
+
         <ContactAndBank register={register} errors={errors} />
 
         <CategoryAndHostal register={register} errors={errors} />

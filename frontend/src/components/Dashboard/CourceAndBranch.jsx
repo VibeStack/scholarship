@@ -1,17 +1,20 @@
 // src/Components/Dashboard/CourceAndBranch.jsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useWatch } from "react-hook-form";
 import SelectField from "./SelectField";
 
-export default function CourceAndBranch({ register, errors, control, setValue }) {
-  // watch the selected course
+export default function CourceAndBranch({
+  register,
+  errors,
+  control,
+}) {
   const selectedCourse = useWatch({
     control,
     name: "course",
   });
 
   // mapping: course -> branches
-  const courseBranches = {
+  const courseInDifferentBranches = {
     "B.Tech": [
       "Computer Science & Engineering",
       "Electrical Engineering",
@@ -41,19 +44,27 @@ export default function CourceAndBranch({ register, errors, control, setValue })
     "B.Arch": [],
   };
 
-  // branches based on selected course (or empty if none)
-  const branchOptions = courseBranches[selectedCourse] || [];
-  const isBranchDisabled = branchOptions.length === 0;
+  const [branchOptions, setBranchOptions] = useState(
+    courseInDifferentBranches[selectedCourse]
+  );
+  const [isBranchDisable, setIsBranchDisable] = useState(true);
+  const [isLeetFieldDisabled, setIsLeetFieldDisabled] = useState(true);
 
-  // ✅ Enable Leet/Non-Leet only for B.Tech
-  const isLeetDisabled = selectedCourse !== "B.Tech";
+  const courseChangeHandler = (e) => {
+    setBranchOptions(courseInDifferentBranches[e.target.value]);
 
-  // ✅ Clear "leet" when not B.Tech (so it shows up as null in final object)
-  useEffect(() => {
-    if (isLeetDisabled) {
-      setValue("leet", null); // always include in object
+    if (courseInDifferentBranches[e.target.value].length === 0) {
+      setIsBranchDisable(true);
+    } else {
+      setIsBranchDisable(false);
     }
-  }, [isLeetDisabled, setValue]);
+
+    if (e.target.value === "B.Tech") {
+      setIsLeetFieldDisabled(false);
+    } else {
+      setIsLeetFieldDisabled(true);
+    }
+  };
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border">
@@ -65,12 +76,13 @@ export default function CourceAndBranch({ register, errors, control, setValue })
         <SelectField
           label="Course"
           id="course"
-          options={Object.keys(courseBranches)}
+          options={Object.keys(courseInDifferentBranches)}
           register={register}
           rules={{
             required: { value: true, message: "Course is required" },
           }}
           errors={errors?.course}
+          onChange={courseChangeHandler}
         />
 
         {/* Branch Selection */}
@@ -80,27 +92,38 @@ export default function CourceAndBranch({ register, errors, control, setValue })
           options={branchOptions}
           register={register}
           rules={
-            isBranchDisabled
-              ? {}
-              : { required: { value: true, message: "Branch is required" } }
+            !isBranchDisable
+              ? {
+                  validate: (value) =>
+                    value === "" ||
+                    branchOptions.includes(value) ||
+                    "Invalid branch selected",
+                }
+              : {}
           }
           errors={errors?.branch}
-          disabled={isBranchDisabled}
+          disabled={isBranchDisable}
         />
 
         {/* Leet/Non-Leet */}
         <SelectField
-          label="Leet/Non-Leet"
+          label="Leet / Non-Leet"
           id="leet"
           options={["Leet", "Non-Leet"]}
           register={register}
           rules={
-            isLeetDisabled
-              ? {}
-              : { required: { value: true, message: "This field is required" } }
+            !isLeetFieldDisabled
+              ? {
+                  validate: (value) =>
+                    value === null ||
+                    value === "Leet" ||
+                    value === "Non-Leet" ||
+                    "Invalid option",
+                }
+              : {}
           }
           errors={errors?.leet}
-          disabled={isLeetDisabled} // ✅ disabled for non-B.Tech
+          disabled={isLeetFieldDisabled}
         />
       </div>
     </div>

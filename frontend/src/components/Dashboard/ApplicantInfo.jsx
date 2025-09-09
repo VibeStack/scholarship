@@ -2,17 +2,25 @@
 import React from "react";
 import InputField from "./InputField";
 
-export default function ApplicantInfo({ register, errors, setYearWiseStart,setDegreeDuration }) {
-  const batchValueChange = (e)=>{
-    const startAndEndYearOfDegree = e.target.value.split('-')
-    setDegreeDuration(startAndEndYearOfDegree[1]-startAndEndYearOfDegree[0])
-    setYearWiseStart(startAndEndYearOfDegree[0])
+export default function ApplicantInfo({
+  register,
+  errors,
+  setYearWiseStart,
+  setDegreeDuration,
+}) {
+
+  const YearWiseFieldCreation = (e) =>{
+    const [startYear,EndYear] = e.target.value.split('-')
+    setYearWiseStart(startYear)
+    setDegreeDuration(EndYear-startYear)
   }
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border">
       <h2 className="text-xl font-bold mb-4 border-b pb-2 text-gray-700">
         Applicant Info
       </h2>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <InputField
           label="Applicant ID"
@@ -26,6 +34,7 @@ export default function ApplicantInfo({ register, errors, setYearWiseStart,setDe
           }}
           errors={errors?.applicantId}
         />
+
         <InputField
           label="Name"
           id="name"
@@ -38,6 +47,7 @@ export default function ApplicantInfo({ register, errors, setYearWiseStart,setDe
           }}
           errors={errors?.name}
         />
+
         <InputField
           label="Father Name"
           id="fatherName"
@@ -50,6 +60,7 @@ export default function ApplicantInfo({ register, errors, setYearWiseStart,setDe
           }}
           errors={errors?.fatherName}
         />
+
         <InputField
           label="Mother Name"
           id="motherName"
@@ -62,6 +73,7 @@ export default function ApplicantInfo({ register, errors, setYearWiseStart,setDe
           }}
           errors={errors?.motherName}
         />
+
         <InputField
           label="DOB"
           id="dob"
@@ -75,6 +87,7 @@ export default function ApplicantInfo({ register, errors, setYearWiseStart,setDe
           }}
           errors={errors?.dob}
         />
+
         <InputField
           label="Batch"
           id="batch"
@@ -97,7 +110,7 @@ export default function ApplicantInfo({ register, errors, setYearWiseStart,setDe
             },
           }}
           errors={errors?.batch}
-          onChange={batchValueChange}
+          onChange={YearWiseFieldCreation}
         />
       </div>
     </div>

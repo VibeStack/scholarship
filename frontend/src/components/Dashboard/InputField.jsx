@@ -4,9 +4,7 @@ export default function InputField({
   register,
   rules,
   errors,
-  placeholder = "",
   type = "text",
-  className = "",
   ...rest
 }) {
   return (
@@ -17,8 +15,8 @@ export default function InputField({
       <input
         id={id}
         type={type}
-        placeholder={placeholder || `Enter ${label}`}
-        className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
+        placeholder={`Enter ${label}`}
+        className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
         {...register(id, rules)}
         {...rest}
       />
