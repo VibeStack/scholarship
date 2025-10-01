@@ -139,6 +139,7 @@ export default function ApplicantInfo({
           setValue(`yearWise.${year}.granted60`, yData.granted60 || "");
         });
       }
+      setValue("remarks", student.remarks || "");
 
       setStatus("success");
       alert("✅ Student data loaded!");

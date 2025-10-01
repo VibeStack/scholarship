@@ -30,8 +30,9 @@ export default function Dashboard() {
   const [degreeDuration, setDegreeDuration] = useState(0);
 
   const onSubmit = async (data) => {
+    const applicantId = data.applicantId?.trim();
+    if (!applicantId) return alert("Applicant ID is required");
 
-    console.log(data)
     // Filter yearWise to only include years with data
     if (data.yearWise) {
       const filteredYearWise = {};
@@ -52,17 +53,37 @@ export default function Dashboard() {
     }
 
     try {
-      const response = await axios.post(`${apiUrl}/api/students`, data, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const existingRes = await axios.get(`${apiUrl}/api/students`);
+      const student = existingRes.data.find(
+        (s) => s.applicantId?.trim() === applicantId
+      );
 
-      if (response.status === 201) {
-        alert("✅ Student data saved successfully!");
-        reset();
-        navigate("/dashboard");
+      let response;
+
+      if (student) {
+        // Student exists → update
+        response = await axios.patch(
+          `${apiUrl}/api/students`,
+          data,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        if (response.status === 200) alert("✅ Student updated successfully!");
       } else {
-        alert("❌ Error : " + response.data.message);
+        // Student does not exist → create
+        response = await axios.post(`${apiUrl}/api/students`, data, {
+          headers: { "Content-Type": "application/json" },
+        });
+        if (response.status === 201) {
+          alert("✅ Student data saved successfully!");
+          reset();
+          navigate("/dashboard");
+        } else {
+          alert("❌ Error : " + response.data.message);
+        }
       }
+
     } catch (error) {
       console.error("Error:", error);
       alert("❌ Error: " + (error.response?.data?.message || error.message));
@@ -115,7 +136,6 @@ export default function Dashboard() {
 
       {/* Main Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-
         <ApplicantInfo
           register={register}
           errors={errors}
