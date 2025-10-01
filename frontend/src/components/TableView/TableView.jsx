@@ -56,8 +56,8 @@ export default function TableView() {
   }, [apiUrl]);
 
   // ✅ Filter students based on batch input
-  // ✅ Filter students based on batch input
   const filteredStudents = useMemo(() => {
+    console.log(batchFilter)
     if (!batchFilter.trim()) return students;
 
     const input = batchFilter.trim();
@@ -184,8 +184,7 @@ export default function TableView() {
           />
         </label>
         <p className="text-sm text-gray-500">
-          Type a single year to get all batches containing that year, or type a
-          range (xxxx-xxxx) for exact batch.
+          Enter a year (e.g., 2020 → batch 2020-2024) or a range (e.g., 2020-2024 → batches 2020-2024 to 2020-2027).
         </p>
       </div>
 

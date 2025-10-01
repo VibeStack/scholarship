@@ -17,6 +17,7 @@ export default function Dashboard() {
     register,
     handleSubmit,
     reset,
+    getValues,
     setValue,
     formState: { errors, isSubmitting },
     control,
@@ -49,7 +50,6 @@ export default function Dashboard() {
       }
       data.yearWise = filteredYearWise;
     }
-
 
     try {
       const response = await axios.post(`${apiUrl}/api/students`, data, {
@@ -121,6 +121,8 @@ export default function Dashboard() {
           errors={errors}
           setYearWiseStart={setYearWiseStart}
           setDegreeDuration={setDegreeDuration}
+          getValues={getValues}
+          setValue={setValue}
         />
 
         <CourceAndBranch
