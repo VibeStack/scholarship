@@ -104,11 +104,11 @@ export default function Dashboard() {
           alt="College Logo"
           className="h-16 w-16 mb-3"
         />
-        <h1 className="text-2xl font-bold text-gray-800">
+        <h1 className="text-2xl font-bold text-gray-800 text-center">
           Guru Nanak Dev Engineering College
         </h1>
-        <p className="text-sm text-gray-600">
-          Scholarship Management System (Teacher Portal)
+        <p className="text-sm text-gray-600 text-center">
+          Scholarship Management System <br />(Teacher Portal)
         </p>
         <button
           onClick={handleLogout}
@@ -119,7 +119,7 @@ export default function Dashboard() {
       </div>
 
       {/* Title */}
-      <h2 className="text-3xl font-extrabold mb-6 text-center bg-gradient-to-r from-red-700 via-red-800 to-black bg-clip-text text-transparent">
+      <h2 className="text-2xl sm:text-3xl font-extrabold mb-6 text-center bg-gradient-to-r from-red-700 via-red-800 to-black bg-clip-text text-transparent">
         Student Scholarship Form
       </h2>
 
