@@ -26,7 +26,14 @@ export default function ColumnSelector({ allColumns, selectedColumns, setSelecte
     setSelectedColumns(selectedColumns.filter((c) => !visibleColumns.includes(c)));
   };
 
-  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+  const formatColumnName = (col) => {
+    // Remove dots and split camelCase
+    return col
+      .replace(/\./g, " ")                 // Replace dots with spaces
+      .replace(/([a-z])([A-Z])/g, "$1 $2") // Add space between camelCase
+      .replace(/\b\w/g, (c) => c.toUpperCase()); // Capitalize each word
+  };
+
 
   return (
     <div className="mb-6 p-4 bg-white rounded-lg shadow border">
@@ -57,7 +64,7 @@ export default function ColumnSelector({ allColumns, selectedColumns, setSelecte
               onChange={() => toggle(col)}
               className="h-4 w-4 rounded border-gray-300 focus:ring-2 focus:ring-indigo-500"
             />
-            <span className="select-none">{capitalize(col.replace(/\./g, ""))}</span>
+            <span className="select-none">{formatColumnName(col)}</span>
           </label>
         ))}
       </div>

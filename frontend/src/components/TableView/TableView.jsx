@@ -118,13 +118,13 @@ export default function TableView() {
     "category.familyIncome",
     "hostel",
     "affidavitBy",
-    "maintenanceAllowance.months",
-    "maintenanceAllowance.rate",
-    "maintenanceAllowance.total",
     "fees.tuitionFee",
     "fees.otherFee",
     "fees.totalFeeClaim",
     "remarks",
+    "maintenanceAllowance.months",
+    "maintenanceAllowance.rate",
+    "maintenanceAllowance.total",
   ];
 
   const handleLogout = () => {
@@ -143,8 +143,8 @@ export default function TableView() {
         <h1 className="text-2xl font-bold text-center text-gray-800">
           Guru Nanak Dev Engineering College
         </h1>
-        <p className="text-sm text-gray-600">
-          Scholarship Management System (Teacher Portal)
+        <p className="text-sm text-gray-600 text-center">
+          Scholarship Management System <br />(Teacher Portal)
         </p>
 
         <div className="absolute right-0 top-0 flex gap-2">
@@ -167,7 +167,7 @@ export default function TableView() {
       </div>
 
       {/* Title */}
-      <h2 className="text-3xl font-extrabold mb-6 text-center bg-gradient-to-r from-red-700 via-red-800 to-black bg-clip-text text-transparent">
+      <h2 className="text-2xl sm:text-3xl font-extrabold mb-6 text-center bg-gradient-to-r from-red-700 via-red-800 to-black bg-clip-text text-transparent">
         Student Scholarship Table
       </h2>
 
@@ -183,7 +183,7 @@ export default function TableView() {
             className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition w-full sm:w-60"
           />
         </label>
-        <p className="text-sm text-gray-500">
+        <p className="text-[12px] sm:text-sm text-gray-500">
           Enter a year (e.g., 2020 → batch 2020-2024) or a range (e.g., 2020-2024 → batches 2020-2024 to 2020-2027).
         </p>
       </div>
