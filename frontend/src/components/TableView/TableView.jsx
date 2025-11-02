@@ -184,7 +184,7 @@ export default function TableView() {
           />
         </label>
         <p className="text-[12px] sm:text-sm text-gray-500">
-          Enter a year (e.g., 2020 → batch 2020-2024) or a range (e.g., 2020-2024 → batches 2020-2024 to 2020-2027).
+          Enter a year (e.g., 2020 → batch 2020-2024) or a range (e.g., 2020-2024 → batches 2020-2024 to 2023-2027).
         </p>
       </div>
 
